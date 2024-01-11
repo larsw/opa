@@ -73,6 +73,11 @@ ifneq (,$(TELEMETRY_URL))
 TELEMETRY_FLAG := -X github.com/open-policy-agent/opa/internal/report.ExternalServiceURL=$(TELEMETRY_URL)
 endif
 
+BINARIES_DIR=/home/larsw/work/accumulo-access-rs/target/release
+LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:$BINARIES_DIR"
+CGO_LDFLAGS="-laccumulo_access -lm -L $(BINARIES_DIR)" #  -ldl
+CGO_ENABLED=1
+
 LDFLAGS := "$(TELEMETRY_FLAG) \
 	-X github.com/open-policy-agent/opa/version.Hostname=$(BUILD_HOSTNAME)"
 
@@ -113,10 +118,10 @@ install: generate
 
 .PHONY: test
 test: go-test wasm-test
-
+# LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}:$(BINARIES_DIR)"
 .PHONY: go-build
 go-build: generate
-	$(GO) build $(GO_TAGS) -o $(BIN) -ldflags $(LDFLAGS)
+	CGO_LDFLAGS=$(CGO_LDFLAGS) CGO_ENABLED=$(CGO_ENABLED) $(GO) build $(GO_TAGS) -o $(BIN) -ldflags $(LDFLAGS)
 
 .PHONY: go-test
 go-test: generate

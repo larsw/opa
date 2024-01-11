@@ -19,6 +19,7 @@ require (
 	github.com/google/go-cmp v0.6.0
 	github.com/google/uuid v1.5.0
 	github.com/gorilla/mux v1.8.1
+	github.com/larsw/go-accumulo-access v0.0.0
 	github.com/olekukonko/tablewriter v0.0.5
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc5
@@ -95,6 +96,8 @@ require (
 	google.golang.org/protobuf v1.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/larsw/go-accumulo-access => ../../larsw/go-accumulo-access
 
 // glog is only used through badger, and only for fatal log-and-exit. However, it comes
 // at a cost, its init function will lookup the current user, and on Windows, that's much

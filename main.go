@@ -5,12 +5,41 @@
 package main
 
 import (
-	"os"
-
+	accumulo "github.com/larsw/go-accumulo-access/pkg"
+	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/cmd"
+	"github.com/open-policy-agent/opa/rego"
+	"github.com/open-policy-agent/opa/types"
+	"os"
 )
 
 func main() {
+	rego.RegisterBuiltin2(
+		&rego.Function{
+			Name:             "accumulo.check_authorization",
+			Decl:             types.NewFunction(types.Args(types.S, types.S), types.B),
+			Memoize:          true,
+			Nondeterministic: true,
+		},
+		func(bctx rego.BuiltinContext, a, b *ast.Term) (*ast.Term, error) {
+
+			var expression, authorizations string
+
+			if err := ast.As(a.Value, &expression); err != nil {
+				return nil, err
+			} else if err := ast.As(b.Value, &authorizations); err != nil {
+				return nil, err
+			}
+
+			req, err := accumulo.CheckAuthorization(expression, authorizations)
+			if err != nil {
+				return nil, err
+			}
+
+			return ast.BooleanTerm(req), nil
+		},
+	)
+
 	if err := cmd.RootCommand.Execute(); err != nil {
 		os.Exit(1)
 	}
