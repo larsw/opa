@@ -5,7 +5,8 @@
 package main
 
 import (
-	accumulo "github.com/larsw/go-accumulo-access/pkg"
+	"fmt"
+	accumulo "github.com/larsw/accumulo-access-go/pkg"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/cmd"
 	"github.com/open-policy-agent/opa/rego"
@@ -21,8 +22,7 @@ func main() {
 			Memoize:          true,
 			Nondeterministic: true,
 		},
-		func(bctx rego.BuiltinContext, a, b *ast.Term) (*ast.Term, error) {
-
+		func(ctx rego.BuiltinContext, a, b *ast.Term) (*ast.Term, error) {
 			var expression, authorizations string
 
 			if err := ast.As(a.Value, &expression); err != nil {
@@ -33,6 +33,7 @@ func main() {
 
 			req, err := accumulo.CheckAuthorization(expression, authorizations)
 			if err != nil {
+				fmt.Printf("%v", err)
 				return nil, err
 			}
 
